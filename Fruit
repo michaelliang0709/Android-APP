@@ -1,0 +1,110 @@
+package com.example.proandroidnutrition;
+
+import com.example.proandroidnutrition.MyAdapter4.ViewHolder;
+import android.os.Bundle;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.widget.Toast;
+
+public class Shuiguo extends Activity {
+
+	ListView list = null;
+	private Intent music = new Intent("com.example.proandroidnutrition.Music");
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_shuiguo);
+        
+        SharedPreferences pr = getSharedPreferences("music", MODE_PRIVATE);
+        boolean state = pr.getBoolean("state", true);
+		if (state) {
+			startService(music);
+		}
+		else {
+			stopService(music);
+		}
+        list=(ListView)findViewById(R.id.lv);    
+        MyAdapter4 adapter=new MyAdapter4(this);    
+        list.setAdapter(adapter);    
+        list.setItemsCanFocus(false);    
+        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);    
+    
+        list.setOnItemClickListener(new OnItemClickListener() {
+        @Override    
+        	public void onItemClick(AdapterView<?> parent, View view,    
+                    int position, long id) {    
+                ViewHolder vHollder = (ViewHolder) view.getTag();    
+                //在每次获取点击的item时将对应的checkbox的选中未选中状态改变，同时修改map的值。
+                vHollder.cb.toggle();    
+                MyAdapter4.isSelected.put(position, vHollder.cb.isChecked());   
+                if(position == 5 && MyAdapter4.isSelected.get(5)) {
+                	Toast.makeText(Shuiguo.this, "亲！橘子与萝卜、牛奶不宜同食哦", Toast.LENGTH_SHORT).show(); 
+                }
+                else if(position == 6 && MyAdapter4.isSelected.get(6)) {
+                	Toast.makeText(Shuiguo.this, "亲！西瓜忌与羊肉同食哦", Toast.LENGTH_SHORT).show(); 
+                }
+                else if(position == 7 && MyAdapter4.isSelected.get(7)) {
+                	Toast.makeText(Shuiguo.this, "亲！柿子不宜与鹅肉、螃蟹、\n甘薯、鸡蛋同食哦", Toast.LENGTH_SHORT).show(); 
+                } 
+        }
+        });  
+    }
+        /**
+        OnClickListener bPop = new OnClickListener() {    
+            @Override    
+            public void onClick(View v) {    
+                for(int i=0;i<list.getCount();i++){    
+                    if(MyAdapter4.isSelected.get(i)){    
+                        ViewHolder vHollder = (ViewHolder) list.getChildAt(i).getTag();    
+                        Log.i("", "--onClick --"+vHollder.title.getText());    
+                    }    
+                }    
+            }    
+        };   */
+    
+    public void Next(View v) {
+    	int [] Para4 = new int [8];
+		Bundle bundle = this.getIntent().getExtras(); 
+		int [] Para1 = bundle.getIntArray("Para1"); 
+		int [] Para2 = bundle.getIntArray("Para2"); 
+		int [] Para3 = bundle.getIntArray("Para3"); 
+		int j = 0;
+    	for( int i = 0 ; i<list.getCount() ; i ++ ) {    
+    			if(MyAdapter4.isSelected.get(i)){    
+    				Para4[j] = i+19;
+    				j ++;
+    			}  
+    	}
+    	if ( j > 3) {
+    		Toast.makeText(Shuiguo.this, "妈妈说了，吃太多不是好孩子！\n（至多三样）", Toast.LENGTH_SHORT).show(); 
+    		j = 0;
+    		return;
+    	}
+    	else if ( j < 1 ) {
+    		Toast.makeText(Shuiguo.this, "亲！至少选一样来一发哦~", Toast.LENGTH_SHORT).show();
+        	return;
+    	}
+    	else {
+    		bundle.putIntArray("Para1", Para1);
+    		bundle.putIntArray("Para2", Para2);
+    		bundle.putIntArray("Para3", Para3);
+    		bundle.putIntArray("Para4", Para4);
+    		Intent intent=new Intent();
+    		intent.setClass(Shuiguo.this, ConMenu.class);
+    		intent.putExtras(bundle);
+    		startActivity(intent);
+    	}
+    }
+    
+    public void GoHome(View v) {
+		Intent intent=new Intent();
+		intent.setClass(Shuiguo.this, MainHome.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); 
+		startActivity(intent);
+    }
+}
