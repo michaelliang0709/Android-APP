@@ -1,0 +1,180 @@
+package com.example.proandroidnutrition;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
+import android.widget.ToggleButton;
+
+public class MainHome extends Activity {
+
+	ImageView iv1 = null;
+	ImageView iv2 = null;
+	ImageView iv3 = null;
+	ImageView iv4 = null;
+	ImageView iv5 = null;
+	ImageView iv6 = null;
+	Button go_btn = null;
+	Button history_btn = null;
+	Button info_btn = null;
+	Button exit_btn = null;
+	ToggleButton tb= null;
+	private Intent music = new Intent("com.example.proandroidnutrition.Music");
+	static boolean tr = true;
+	static boolean fa = false;
+	
+	//static boolean isBehind = false;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_main_home);       
+        
+        tb=(ToggleButton)findViewById(R.id.toggleButton1);
+        SharedPreferences pr = getSharedPreferences("music", MODE_PRIVATE);
+    	boolean state = pr.getBoolean("state", true);
+		if (state) {
+			startService(music);
+			tb.setChecked(true);
+		}
+		else {
+			stopService(music);
+			tb.setChecked(false);
+		}
+        
+        iv1 = (ImageView)findViewById(R.id.hello);
+        iv2 = (ImageView)findViewById(R.id.zhang);
+        iv3 = (ImageView)findViewById(R.id.shang);
+        iv4 = (ImageView)findViewById(R.id.ying);
+        iv5 = (ImageView)findViewById(R.id.yang);
+        iv6 = (ImageView)findViewById(R.id.shi);
+        go_btn = (Button)findViewById(R.id.go_btn);
+        history_btn = (Button)findViewById(R.id.history_btn);
+        info_btn = (Button)findViewById(R.id.info_btn);
+        exit_btn = (Button)findViewById(R.id.exit_btn);
+        
+        Animation animation1 = AnimationUtils.loadAnimation(MainHome.this, R.anim.homeanim1);
+		iv1.startAnimation(animation1);
+        Animation animation2 = AnimationUtils.loadAnimation(MainHome.this, R.anim.homeanim2);
+		iv2.startAnimation(animation2);
+		Animation animation3 = AnimationUtils.loadAnimation(MainHome.this, R.anim.homeanim3);
+		iv3.startAnimation(animation3);
+		Animation animation4 = AnimationUtils.loadAnimation(MainHome.this, R.anim.homeanim4);
+		iv4.startAnimation(animation4);
+		Animation animation5 = AnimationUtils.loadAnimation(MainHome.this, R.anim.homeanim5);
+		iv5.startAnimation(animation5);
+		Animation animation6 = AnimationUtils.loadAnimation(MainHome.this, R.anim.homeanim6);
+		iv6.startAnimation(animation6);
+		
+		tb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton arg0, boolean isChecked) {
+                if(isChecked){
+                	startService(music);
+                	SharedPreferences pr = getSharedPreferences("music", MODE_PRIVATE);
+                	SharedPreferences.Editor ed = pr.edit();
+                	ed.putBoolean("state", tr).commit();
+                }else{
+                	stopService(music);
+                	SharedPreferences pr = getSharedPreferences("music", MODE_PRIVATE);
+                	SharedPreferences.Editor ed = pr.edit();
+                	ed.putBoolean("state", fa).commit();
+                }
+                 
+            }
+        });
+    }
+    /**@Override
+    public void onResume() {
+    	super.onResume();
+    	isBehind = false;
+    	if (!MusicServer.isPlay) {
+    		startService(music);
+    		tb.setChecked(true);
+    	}
+    }
+    @Override
+    public void onPause() {
+    	super.onPause();
+    	isBehind = true;
+    }
+    @Override
+    public void onStop() {
+    	super.onStop();
+    	if (isBehind != false ) {
+    		stopService(music);
+    		tb.setChecked(false);
+    	}
+    }*/
+    
+    public void Go(View v) {
+		Intent intent=new Intent();
+		intent.setClass(MainHome.this, Zhushi.class);
+		startActivity(intent);
+    }
+    public void Shuoming(View v) {
+		Intent intent=new Intent();
+		intent.setClass(MainHome.this, Shuoming.class);
+		startActivity(intent);
+    }
+    public void History(View v) {
+		Intent intent=new Intent();
+		intent.setClass(MainHome.this, History.class);
+		startActivity(intent);
+    }
+    public void Gallery(View v) {
+		Intent intent=new Intent();
+		intent.setClass(MainHome.this, Gallery.class);
+		startActivity(intent);
+    }
+    public void Exit(View v) {
+    	dialog();
+    }
+    
+    protected void dialog() { 
+        AlertDialog.Builder builder = new Builder(MainHome.this); 
+        builder.setIcon(R.drawable.messages);
+        builder.setMessage("真的要退出这么好的软件吗? ☺"); 
+        builder.setTitle("掌上营养师温馨提醒"); 
+        builder.setPositiveButton("当然啦", 
+                new android.content.DialogInterface.OnClickListener() { 
+                    @Override 
+                    public void onClick(DialogInterface dialog, int which) { 
+                        dialog.dismiss(); 
+                        //Intent exit = new Intent(Intent.ACTION_MAIN);
+                        //exit.addCategory(Intent.CATEGORY_HOME);
+                        //exit.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        stopService(music);
+                        //tb.setChecked(false);
+                        //startActivity(exit);
+                        finish();
+                    } 
+                }); 
+        builder.setNegativeButton("按错了", 
+                new android.content.DialogInterface.OnClickListener() { 
+                    @Override 
+                    public void onClick(DialogInterface dialog, int which) { 
+                        dialog.dismiss(); 
+                    } 
+                }); 
+        builder.create().show(); 
+    } 
+    @Override 
+    public boolean onKeyDown(int keyCode, KeyEvent event) { 
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) { 
+            dialog(); 
+        } 
+        return false; 
+    }
+}
