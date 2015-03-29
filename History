@@ -1,0 +1,60 @@
+package com.example.proandroidnutrition;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
+public class History extends Activity {
+	
+	public ListView lv=null;
+	public List<Map<String,Object>> list=null;
+	public SimpleAdapter adapter=null;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_history);
+		lv = (ListView)findViewById(R.id.lv);
+		list=new ArrayList<Map<String,Object>>();
+		
+		DatabaseHelper dbHelper=new DatabaseHelper(History.this,"nutrition.db");
+		SQLiteDatabase db=dbHelper.getReadableDatabase();
+		Cursor cursor=db.query("table_3",new String[]{"dish"},null,null,null,null,null);
+		while(cursor.moveToNext()){
+			String Dish=cursor.getString(cursor.getColumnIndex("dish"));
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("dish",Dish);
+			list.add(map);
+		}
+		SimpleAdapter adapter = new SimpleAdapter(this, list,  R.layout.history,        
+        		new String[]{"dish"},new int[]{R.id.ctitle} );
+        lv.setAdapter(adapter);
+	}
+
+	public void Back(View v) {
+		Intent intent=new Intent();
+		intent.setClass(History.this, MainHome.class);
+		startActivity(intent);
+    }
+	
+	public void Clear(View v){
+		DatabaseHelper dbHelper=new DatabaseHelper(History.this,"nutrition.db");
+		SQLiteDatabase db=dbHelper.getWritableDatabase();
+		db.delete("table_3", null, null);
+        list.clear();
+        SimpleAdapter adapter = new SimpleAdapter(this, list,  R.layout.history,        
+        		new String[]{"dish"},new int[]{R.id.ctitle} );
+		lv.setAdapter(adapter);
+		adapter.notifyDataSetChanged();
+	}
+}
