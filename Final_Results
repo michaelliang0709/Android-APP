@@ -1,0 +1,301 @@
+package com.example.proandroidnutrition;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+public class TotalResult extends Activity {
+	private Intent music = new Intent("com.example.proandroidnutrition.Music");
+	public float sumEnergy=0;
+	public float sumProtein=0;
+	public float sumCarbohydrate=0;
+	public float sumVitamin_A=0;
+	public float sumVitamin_C=0;
+	public float sumVitamin_E=0;
+	public float sumFat=0;
+	public float sumNa=0;
+	public float sumK=0;
+	public float sumCa=0;
+	public float sumP=0;
+	public String fit=null;
+	public String unfit=null;
+	public String crash=null;
+	public TextView result1=null;
+	public TextView result2=null;
+	public TextView result3=null;
+	public TextView result4=null;
+	public int id=0;
+	public int weight=1;
+	private TextView tv;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_total_result);
+		
+		SharedPreferences pr = getSharedPreferences("music", MODE_PRIVATE);
+		boolean state = pr.getBoolean("state", true);
+		if (state) {
+			startService(music);
+		}
+		else {
+			stopService(music);
+		}
+		tv = (TextView)findViewById(R.id.result1);
+		tv.requestFocus(); 
+
+		result1=(TextView)findViewById(R.id.result1);
+		result2=(TextView)findViewById(R.id.result2);
+		result3=(TextView)findViewById(R.id.result3);
+		result4=(TextView)findViewById(R.id.result4);
+		Bundle bundle=this.getIntent().getExtras();
+		int [] Para1 = bundle.getIntArray("Para1"); 
+		int [] Para2 = bundle.getIntArray("Para2"); 
+		int [] Para3 = bundle.getIntArray("Para3"); 
+		int [] Para4 = bundle.getIntArray("Para4"); 
+		
+		for(int i=0;i<=25;i++){
+			if(i<4){
+				 id= Para1[i];
+			}
+			else if(i<10){
+				 id=Para2[i-4];
+			}
+			else if(i<18){
+				 id=Para3[i-10];
+			}
+			else{
+				 id=Para4[i-18];
+			}
+			
+		if(id!=0 ){
+			if(id<5){
+				weight=3;
+			}else if(id<11){
+				weight=1;
+			}else if(id<19){
+				weight=2;
+			}else{
+				weight=2;
+			}
+			
+			String Id=Integer.toString(id);
+			DatabaseHelper  dbHelper=new DatabaseHelper(TotalResult.this,"nutrition.db");
+			SQLiteDatabase db=dbHelper.getReadableDatabase();
+			Cursor cursor1=db.query("table_1",new String[]{"energy"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor1.moveToNext()){
+				Float Energy = cursor1.getFloat(cursor1.getColumnIndex("energy"));
+				sumEnergy+=Energy*weight;	
+			}
+			Cursor cursor2=db.query("table_1",new String[]{"protein"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor2.moveToNext()){
+				Float Protein = cursor2.getFloat(cursor2.getColumnIndex("protein"));
+				sumProtein+=Protein*weight;
+			}
+			Cursor cursor3=db.query("table_1",new String[]{"carbohydrate"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor3.moveToNext()){
+				Float Carbohydrate = cursor3.getFloat(cursor3.getColumnIndex("carbohydrate"));
+				sumCarbohydrate+=Carbohydrate*weight;
+				}
+			Cursor cursor4=db.query("table_1",new String[]{"vitamin_A"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor4.moveToNext()){
+				Float Vitamin_A = cursor4.getFloat(cursor4.getColumnIndex("vitamin_A"));
+				sumVitamin_A+=Vitamin_A*weight;
+				}
+			Cursor cursor5=db.query("table_1",new String[]{"vitamin_C"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor5.moveToNext()){
+				Float Vitamin_C = cursor5.getFloat(cursor5.getColumnIndex("vitamin_C"));
+				sumVitamin_C+=Vitamin_C*weight;
+				}
+			Cursor cursor6=db.query("table_1",new String[]{"vitamin_E"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor6.moveToNext()){
+				Float Vitamin_E = cursor6.getFloat(cursor6.getColumnIndex("vitamin_E"));
+				sumVitamin_E+=Vitamin_E*weight;
+				}
+			Cursor cursor7=db.query("table_1",new String[]{"fat"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor7.moveToNext()){
+				Float Fat = cursor7.getFloat(cursor7.getColumnIndex("fat"));
+				sumFat+=Fat*weight;
+				}
+			Cursor cursor8=db.query("table_1",new String[]{"Na"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor8.moveToNext()){
+				Float Na = cursor8.getFloat(cursor8.getColumnIndex("Na"));
+				sumNa+=Na*weight;
+				}
+			Cursor cursor9=db.query("table_1",new String[]{"K"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor9.moveToNext()){
+				Float K = cursor9.getFloat(cursor9.getColumnIndex("K"));
+				sumK+=K*weight;
+				}
+			Cursor cursor10=db.query("table_1",new String[]{"Ca"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor10.moveToNext()){
+				Float Ca = cursor10.getFloat(cursor10.getColumnIndex("Ca"));
+				sumCa+=Ca*weight;
+				}
+			Cursor cursor11=db.query("table_1",new String[]{"P"}, "id=?", new String[]{Id}, null, null, null);
+			while(cursor11.moveToNext()){
+				Float P = cursor11.getFloat(cursor11.getColumnIndex("P"));
+				sumP+=P*weight;	
+				}
+			Cursor cursor12=db.query("table_1",new String[]{"fit"},"id=?",new String[]{Id},null,null,null);
+			while(cursor12.moveToNext()){
+				String fit = cursor12.getString(cursor12.getColumnIndex("fit"));
+				if(fit.length()>1){
+					result3.append(fit+"\n"+"\n");
+				}else{continue;}
+			}
+			Cursor cursor13=db.query("table_1",new String[]{"unfit"},"id=?",new String[]{Id},null,null,null);
+			while(cursor13.moveToNext()){
+				String unfit = cursor13.getString(cursor13.getColumnIndex("unfit"));
+				if(unfit.length()>1){
+					result4.append(unfit+"\n"+"\n");
+				}else{continue;}
+			}
+			Cursor cursor14=db.query("table_1",new String[]{"crash"},"id=?",new String[]{Id},null,null,null);
+			while(cursor14.moveToNext()){
+				String crash = cursor14.getString(cursor14.getColumnIndex("crash"));
+				if(crash.length()>1){
+					result4.append(crash+"\n"+"\n");
+				}else{continue;}
+			}
+		}
+		else{continue;}
+		}
+		
+		DatabaseHelper  dbHelper=new DatabaseHelper(TotalResult.this,"nutrition.db");
+		SQLiteDatabase db=dbHelper.getReadableDatabase();
+		Cursor cursor15=db.query("table_2",new String[]{"average"},"nutrition=?",new String[]{"energy"},null,null,null);
+		while(cursor15.moveToNext()){
+			Float avgEnergy=cursor15.getFloat(cursor15.getColumnIndex("average"));
+			if(sumEnergy>=avgEnergy){
+				result2.append("【Energy】≥2400kCal："+"\n"+"菜谱中食物富含能量,保证一天精力充沛!"+"\n");
+			}
+			else{
+				continue;
+			}
+		}
+		
+		Cursor cursor16=db.query("table_2",new String[]{"average"},"nutrition=?",new String[]{"protein"},null,null,null);
+		while(cursor16.moveToNext()){
+			Float avgProtein=cursor16.getFloat(cursor16.getColumnIndex("average"));
+			if(sumProtein>=avgProtein){
+				result2.append("【Protein】≥55g："+"\n"+"蛋白质足量摄入,促进新陈代谢,维持正常生命周期。"+"\n");
+			}
+			else{
+				continue;
+			}
+		}
+		
+		Cursor cursor17=db.query("table_2",new String[]{"average"},"nutrition=?",new String[]{"vitamin_A"},null,null,null);
+		while(cursor17.moveToNext()){
+			Float avgVitamin_A=cursor17.getFloat(cursor17.getColumnIndex("average"));
+			if(sumVitamin_A>=avgVitamin_A){
+				result2.append("【Va】≥800ug："+"\n"+"有效地促进视力发育,预防眼部疾病。"+"\n");
+			}
+			else{
+				continue;
+			}
+		}
+		
+		Cursor cursor18=db.query("table_2",new String[]{"average"},"nutrition=?",new String[]{"vitamin_C"},null,null,null);
+		while(cursor18.moveToNext()){
+			Float avgVitamin_C=cursor18.getFloat(cursor18.getColumnIndex("average"));
+			if(sumVitamin_C>=avgVitamin_C){
+				result2.append("【Vc】≥100mg："+"\n"+"多摄入Vc,提高免疫力,预防癌症。"+"\n");
+			}
+			else{
+				continue;
+			}
+		}
+		
+		Cursor cursor19=db.query("table_2",new String[]{"average"},"nutrition=?",new String[]{"vitamin_E"},null,null,null);
+		while(cursor19.moveToNext()){
+			Float avgVitamin_E=cursor19.getFloat(cursor19.getColumnIndex("average"));
+			if(sumVitamin_E>=avgVitamin_E){
+				result2.append("【Ve】≥14mg："+"\n"+"有助于延缓衰老,永葆青春,女孩子们还等什么呢?"+"\n");
+			}
+			else{
+				continue;
+			}
+		}
+		
+		Cursor cursor20=db.query("table_2",new String[]{"average"},"nutrition=?",new String[]{"Na"},null,null,null);
+		while(cursor20.moveToNext()){
+			Float avgNa=cursor20.getFloat(cursor20.getColumnIndex("average"));
+			if(sumNa>=avgNa){
+				result2.append("【Na】≥2200mg："+"\n"+"维持体内酸和碱的平衡,保证体内循环平衡。"+"\n");
+			}
+			else{
+				continue;
+			}
+		}
+		
+		Cursor cursor21=db.query("table_2",new String[]{"average"},"nutrition=?",new String[]{"K"},null,null,null);
+		while(cursor21.moveToNext()){
+			Float avgK=cursor21.getFloat(cursor21.getColumnIndex("average"));
+			if(sumK>=avgK){
+				result2.append("【K】≥2000mg："+"\n"+"保护心肌功能,避免心脏疾病。"+"\n");
+			}
+			else{
+				continue;
+			}
+		}
+		
+		Cursor cursor22=db.query("table_2",new String[]{"average"},"nutrition=?",new String[]{"Ca"},null,null,null);
+		while(cursor22.moveToNext()){
+			Float avgCa=cursor22.getFloat(cursor22.getColumnIndex("average"));
+			if(sumCa>=avgCa){
+				result2.append("【Ca】≥800mg："+"\n"+"促进骨骼发育,妈妈再也不用担心我的身高了。"+"\n");
+			}
+			else{
+				continue;
+			}
+		}
+		
+		Cursor cursor23=db.query("table_2",new String[]{"average"},"nutrition=?",new String[]{"P"},null,null,null);
+		while(cursor23.moveToNext()){
+			Float avgP=cursor23.getFloat(cursor23.getColumnIndex("average"));
+			if(sumP>=avgP){
+				result2.append("【P】≥700mg："+"\n"+"有助于心脏有规律地跳动、维持肾脏正常机能。"+"\n");
+			}
+			else{
+				continue;
+			}
+		}
+		
+		float  sumenergy  = (float)(Math.round(sumEnergy*100))/100;
+		result1.append("   能量："+sumenergy+"千卡");
+		float  sumprotein  = (float)(Math.round(sumProtein*100))/100;
+		result1.append("   蛋白质："+sumprotein+"克");
+		float  sumcarbohydrate  = (float)(Math.round(sumCarbohydrate*100))/100;
+		result1.append("   碳水化合物："+sumcarbohydrate+"克");
+		float  sumvitamin_A  = (float)(Math.round(sumVitamin_A*100))/100;
+		result1.append("  维生素A："+sumvitamin_A+"微克");
+		float  sumvitamin_C  = (float)(Math.round(sumVitamin_C*100))/100;
+		result1.append("  维生素C："+sumvitamin_C+"微克");
+		float  sumvitamin_E  = (float)(Math.round(sumVitamin_E*100))/100;
+		result1.append("  维生素E："+sumvitamin_E+"微克");
+		float  sumfat  = (float)(Math.round(sumFat*100))/100;
+		result1.append("   脂肪："+sumfat+"克");
+		float  sumna  = (float)(Math.round(sumNa*100))/100;
+		result1.append("   钠："+sumna+"毫克");
+		float  sumk  = (float)(Math.round(sumK*100))/100;
+		result1.append("   钾："+sumk+"毫克");
+		float  sumca  = (float)(Math.round(sumCa*100))/100;
+		result1.append("   钙："+sumca+"毫克");
+		float  sump  = (float)(Math.round(sumP*100))/100;
+		result1.append("   磷："+sump+"毫克");
+		
+		}
+	
+	public void GoHome(View v) {
+		Intent intent=new Intent();
+		intent.setClass(TotalResult.this, MainHome.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); 
+		startActivity(intent);
+    }
+}
