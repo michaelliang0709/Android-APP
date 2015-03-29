@@ -1,0 +1,13 @@
+package com.example.proandroidnutrition;
+
+import android.os.Bundle;
+import android.app.Activity;
+
+public class Shuoming extends Activity {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_shuoming);
+    }
+}
