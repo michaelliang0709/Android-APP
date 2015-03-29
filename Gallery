@@ -1,0 +1,38 @@
+package com.example.proandroidnutrition;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+public class Gallery extends Activity {
+	private static final Integer[] alldish = { R.drawable.pinguo3, R.drawable.bocai3, R.drawable.jiangya3,  
+		R.drawable.luyu3, R.drawable.shizi3, R.drawable.youbaoxia3, R.drawable.xie3, R.drawable.mihoutao3, R.drawable.mantou3, 
+		R.drawable.qiezi3, R.drawable.luobo3, R.drawable.juzi3, R.drawable.mian3, R.drawable.putao3, R.drawable.kongxincai3, 
+		R.drawable.yumi3, R.drawable.rou3, R.drawable.xihongshi3, R.drawable.fan3, R.drawable.sigua3, R.drawable.qingcai3, 
+		R.drawable.shenli3, R.drawable.xiangjiao3, R.drawable.ji3, R.drawable.xigua3 };
+		
+	public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_gallery);
+        
+        /**Random r=new Random();  
+		Integer gallery[]=new Integer[15];  
+		int index=0;  
+		for( int i = 0 ; i<15 ; i++)  {  
+			//刚开始从数组中随机抽取一个  
+			//而后将抽取的元素后面的元素向前推进到随机的位置[index位置]  
+			//随着循环的继续,逐渐抛弃后面的元素  
+			index=r.nextInt(alldish.length-i); 
+			gallery[i]=alldish[index];  
+			//元素向前推进到随机[index]的位置  
+			for( int j = index ; j<alldish.length-i-1 ; j++) {  
+				alldish[j]=alldish[j+1]; 
+			}  
+		} 
+        int a=(int)(Math.random()*10);*/
+        ImageAdapter adapter = new ImageAdapter(this, alldish);
+        adapter.createReflectedImages(); 
+
+        GalleryFlow galleryFlow = (GalleryFlow) findViewById(R.id.Gallery01);
+        galleryFlow.setAdapter(adapter);
+	}
+}
