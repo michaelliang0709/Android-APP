@@ -1,0 +1,112 @@
+package com.example.proandroidnutrition;
+
+import java.util.ArrayList;    
+import java.util.HashMap;    
+import java.util.List;    
+import java.util.Map;    
+
+import android.content.Context;    
+import android.view.LayoutInflater;    
+import android.view.View;    
+import android.view.ViewGroup;    
+import android.widget.BaseAdapter;    
+import android.widget.CheckBox;    
+import android.widget.ImageView;    
+import android.widget.TextView;    
+	
+	public class MyAdapter2 extends BaseAdapter {    
+		
+	//荤菜图片名1
+	private static final int[] HunCai1= { R.drawable.ji1, R.drawable.jiangya1, R.drawable.luyu1, R.drawable.rou1, 
+			R.drawable.youbaoxia1, R.drawable.xie1 };	
+	//荤菜名
+	private static final String[] HCname = { "白斩鸡", "文虎酱鸭", "糖醋鲈鱼", "东坡肉", "油爆虾", "清炒梭子蟹" };
+	//荤菜简介
+	private static final String[] HCjj = { "脂肪含量低，所含脂肪多为不饱和脂肪酸，为小儿、中老年人、心血管疾病患者、病中病后虚弱者理想的蛋白质食品。", 
+		"鸭肉性寒凉，性寒，味甘，咸，主大补虚劳。含B族维生素和维生素E较多，能有效抵抗神经炎和多种炎症。", 
+		"鲈鱼鱼肉质白嫩、清香，没有腥味，最宜清蒸或炖汤。尤其是秋末冬初，鲈鱼成熟肥美，鱼体内积累的营养物质也最丰富。", 
+		"猪肉含有丰富的优质蛋白质和脂肪酸，能改善缺铁性贫血，补肾养血；猪肉胆固醇含量偏高，肥胖人群及血脂较高者不宜多食。", 
+		"虾中含有丰富的镁，能很好的保护心血管系统，它可减少血液中胆固醇含量，防止动脉硬化。", 
+		"梭子蟹肉质细嫩、洁白，富含蛋白质、脂肪及多种矿物质。" };
+
+    private LayoutInflater mInflater;    
+    private List<Map<String, Object>> listitem;    
+    public static Map<Integer, Boolean> isSelected;    
+    
+    public MyAdapter2(Context context) {    
+        mInflater = LayoutInflater.from(context);    
+        init();    
+    }    
+    
+    //初始化    
+    private void init() {    
+        listitem =new ArrayList<Map<String, Object>>();    
+        for ( int i = 0 ; i < HunCai1.length ; i++ )  {    
+            Map<String, Object> map = new HashMap<String, Object>();    
+            map.put( "img", HunCai1[i] );    
+            map.put( "title", HCname[i] );  
+            map.put( "info", HCjj[i] );
+            listitem.add(map);    
+       }    
+        //这儿定义isSelected这个map是记录每个listitem的状态，初始状态全部为false。    
+        isSelected = new HashMap<Integer, Boolean>();    
+        for (int i = 0; i < listitem.size(); i++) {    
+            isSelected.put(i, false);    
+        }    
+    }    
+    
+    @Override    
+    public int getCount() {    
+        return listitem.size();    
+    }    
+    
+    @Override    
+    public Object getItem(int position) {    
+        return null;    
+    }    
+    
+    @Override    
+    public long getItemId(int position) {    
+        return 0;    
+    }    
+    
+    class ViewHolder {    
+        public ImageView img;    
+        public TextView title; 
+        public TextView info; 
+        public CheckBox cb;    
+    }    
+    @Override    
+    public View getView(final int position, View convertView, ViewGroup parent) {    
+        ViewHolder vHollder = null;    
+        //convertView为null的时候初始化convertView    
+        if (convertView == null) {    
+            vHollder = new ViewHolder();    
+            convertView = mInflater.inflate(R.layout.activity_my_adapter, null);    
+            vHollder.img = (ImageView) convertView.findViewById(R.id.img);    
+            vHollder.title = (TextView) convertView.findViewById(R.id.title);    
+            vHollder.info = (TextView) convertView.findViewById(R.id.info); 
+            vHollder.cb = (CheckBox) convertView.findViewById(R.id.cb);    
+            convertView.setTag(vHollder);    
+        } else {    
+            vHollder = (ViewHolder) convertView.getTag();    
+        }    
+        vHollder.img.setBackgroundResource((Integer) listitem.get(position).get("img"));    
+        vHollder.title.setText(listitem.get(position).get("title").toString());    
+        vHollder.info.setText(listitem.get(position).get("info").toString()); 
+        vHollder.cb.setChecked(isSelected.get(position));    
+        /**vHollder.cb.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if (isSelected.get(position)) {
+					isSelected.put(position, false);
+				} else {
+					isSelected.put(position, true);
+				}
+				notifyDataSetChanged();
+			}
+		});*/
+        return convertView;
+    }
+	}
