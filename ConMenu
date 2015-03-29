@@ -1,0 +1,136 @@
+package com.example.proandroidnutrition;
+
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+
+public class ConMenu extends Activity {
+	public String dish="";
+	private Intent music = new Intent("com.example.proandroidnutrition.Music");
+	//图片名
+	private static final int[] pic = { R.drawable.fan2, R.drawable.mian2, R.drawable.yumi2, R.drawable.mantou2, 
+		R.drawable.ji2, R.drawable.jiangya2, R.drawable.luyu2, R.drawable.rou2, R.drawable.youbaoxia2, R.drawable.xie2, 
+		R.drawable.bocai2, R.drawable.luobo2, R.drawable.kongxincai2, R.drawable.xihongshi2, R.drawable.qiezi2, 
+		R.drawable.baicai, R.drawable.sigua2, R.drawable.qingcai2, R.drawable.mihoutao2, R.drawable.shenli2, R.drawable.xiangjiao2,
+		R.drawable.putao2, R.drawable.pinguo2, R.drawable.juzi2, R.drawable.xigua2, R.drawable.shizi2 };
+	//菜名
+	private static final String[] name = { "米饭", "面条", "玉米", "馒头", "白斩鸡", "文虎酱鸭", "糖醋鲈鱼", "东坡肉", "油爆虾", "清炒梭子蟹", 
+		"素炒菠菜", "葱油白萝卜", "炒空心菜", "西红柿炒豆腐", "红烧茄子", "白菜烩蘑菇", "清炒丝瓜", "香干炒芹菜", "猕猴桃", "生梨", "香蕉", "葡萄", "苹果", "橘子", "西瓜 ", "柿子" };
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		//requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.activity_conmenu); 
+		
+		SharedPreferences pr = getSharedPreferences("music", MODE_PRIVATE);
+		boolean state = pr.getBoolean("state", true);
+		if (state) {
+			startService(music);
+		}
+		else {
+			stopService(music);
+		}
+		ListView lv = (ListView)findViewById(R.id.clv);
+		Bundle bundle = this.getIntent().getExtras(); 
+		int [] Para1 = bundle.getIntArray("Para1"); 
+		int [] Para2 = bundle.getIntArray("Para2"); 
+		int [] Para3 = bundle.getIntArray("Para3"); 
+		int [] Para4 = bundle.getIntArray("Para4"); 
+		
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();  
+		for (int i = 0 ; i <Para1.length ; i ++) {
+			if (Para1[i]>0) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("img", pic[Para1[i]-1]);
+				map.put("title", name[Para1[i]-1]);
+				list.add(map);
+				dish+=name[Para1[i]-1]+"  ";
+			}
+		}
+		for (int j = 0 ; j <Para2.length ; j ++) {
+			if (Para2[j]>0) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("img", pic[Para2[j]-1]);
+				map.put("title", name[Para2[j]-1]);
+				list.add(map);
+				dish+=name[Para2[j]-1]+"  ";
+			}
+		}
+		for (int k = 0 ; k <Para3.length ; k ++) {
+			if (Para3[k]>0) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("img", pic[Para3[k]-1]);
+				map.put("title", name[Para3[k]-1]);
+				list.add(map);
+				dish+=name[Para3[k]-1]+"  ";
+			}
+		}
+		for (int l = 0 ; l <Para4.length ; l ++) {
+			if (Para4[l]>0) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("img", pic[Para4[l]-1]);
+				map.put("title", name[Para4[l]-1]);
+				list.add(map);
+				dish+=name[Para4[l]-1]+"  ";
+			}
+		}
+		SimpleAdapter adapter = new SimpleAdapter(this, list,  R.layout.conmenu,        
+        		new String[]{"img","title"}, new int[]{R.id.cimg,R.id.ctitle});
+        lv.setAdapter(adapter);
+	}
+			
+	public void GoHome(View v) {
+		Intent intent=new Intent();
+		intent.setClass(ConMenu.this, MainHome.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); 
+		startActivity(intent);
+    }
+	public void Back1(View v) {
+		Intent intent=new Intent();
+		intent.setClass(ConMenu.this, Zhushi.class);
+		startActivity(intent);
+    }
+	
+	public void Result(View v) {
+		Intent intent=new Intent();
+		SimpleDateFormat   formatter   =   new   SimpleDateFormat   ("yyyy年MM月dd日   HH:mm:ss     "); 
+		Date curDate = new Date(System.currentTimeMillis());
+		String str = formatter.format(curDate);
+		dish=str+"                         "+dish;
+		intent.setClass(ConMenu.this, Tab.class);
+		Bundle bundle = this.getIntent().getExtras(); 
+		int [] Para1 = bundle.getIntArray("Para1"); 
+		int [] Para2 = bundle.getIntArray("Para2"); 
+		int [] Para3 = bundle.getIntArray("Para3"); 
+		int [] Para4 = bundle.getIntArray("Para4"); 
+		bundle.putIntArray("Para1", Para1);
+		bundle.putIntArray("Para2", Para2);
+		bundle.putIntArray("Para3", Para3);
+		bundle.putIntArray("Para4", Para4);
+		intent.putExtras(bundle);
+		startActivity(intent);
+		ContentValues values = new ContentValues();
+		values.put("dish",dish);
+		DatabaseHelper dbHelper = new DatabaseHelper(ConMenu.this,"nutrition.db",2);
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		db.insert("table_3",null, values);
+		
+	}
+}
