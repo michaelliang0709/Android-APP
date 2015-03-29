@@ -1,0 +1,107 @@
+package com.example.proandroidnutrition;
+
+import com.example.proandroidnutrition.MyAdapter2.ViewHolder;
+import android.os.Bundle;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+
+public class Huncai extends Activity {
+
+	ListView list = null;
+	private Intent music = new Intent("com.example.proandroidnutrition.Music");
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_huncai);
+		
+        SharedPreferences pr = getSharedPreferences("music", MODE_PRIVATE);
+        boolean state = pr.getBoolean("state", true);
+		if (state) {
+			startService(music);
+		}
+		else {
+			stopService(music);
+		}
+        list=(ListView)findViewById(R.id.lv);    
+        MyAdapter2 adapter=new MyAdapter2(this);    
+        list.setAdapter(adapter);    
+        list.setItemsCanFocus(false);    
+        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);    
+    
+        list.setOnItemClickListener(new OnItemClickListener() {
+        @Override    
+        	public void onItemClick(AdapterView<?> parent, View view,    
+                    int position, long id) {    
+                ViewHolder vHollder = (ViewHolder) view.getTag();    
+                //在每次获取点击的item时将对应的checkbox的选中未选中状态改变，同时修改map的值。    
+                vHollder.cb.toggle();    
+                MyAdapter2.isSelected.put(position, vHollder.cb.isChecked()); 
+                if(position == 2 && MyAdapter2.isSelected.get(2)) {
+                	Toast.makeText(Huncai.this, "亲！鲈鱼忌与牛羊油、奶酷\n和中药荆芥同食哦", Toast.LENGTH_SHORT).show(); 
+                }
+                else if(position == 4 && MyAdapter2.isSelected.get(4)) {
+                	Toast.makeText(Huncai.this, "亲！食虾时严禁同时服用大量维生素C哦", Toast.LENGTH_SHORT).show(); 
+                }
+                else if(position == 5 && MyAdapter2.isSelected.get(5)) {
+                	Toast.makeText(Huncai.this, "亲！螃蟹不宜与柿子同食哦", Toast.LENGTH_SHORT).show(); 
+                }   
+        }
+        });  
+    }
+        /**
+        OnClickListener bPop = new OnClickListener() {    
+            @Override    
+            public void onClick(View v) {    
+                for(int i=0;i<list.getCount();i++){    
+                    if(MyAdapter2.isSelected.get(i)){    
+                        ViewHolder vHollder = (ViewHolder) list.getChildAt(i).getTag();    
+                        Log.i("", "--onClick --"+vHollder.title.getText());    
+                    }    
+                }    
+            }    
+        };   */
+    
+    public void Next(View v) {
+    	int [] Para2 = new int [6];
+	    Bundle bundle = this.getIntent().getExtras(); 
+		int [] Para1 = bundle.getIntArray("Para1"); 
+		int j = 0;
+    	for( int i = 0 ; i<list.getCount() ; i ++ ) {    
+    			if(MyAdapter2.isSelected.get(i)){    
+    				Para2[j] = i+5;
+    				j ++;
+    			}  
+    	}
+    	if ( j >3 ) {
+    		Toast.makeText(Huncai.this, "妈妈说了，吃太多不是好孩子！\n（至多三样）", Toast.LENGTH_SHORT).show(); 
+    		j = 0;
+    		return;
+    	}
+    	else if ( j < 1 ) {
+    		Toast.makeText(Huncai.this, "亲！至少选一样来一发哦~", Toast.LENGTH_SHORT).show(); 
+        	return;
+    	}
+    	else {
+    		bundle.putIntArray("Para1", Para1);
+    		bundle.putIntArray("Para2", Para2);
+    		Intent intent=new Intent();
+    		intent.setClass(Huncai.this, Sucai.class);
+    		intent.putExtras(bundle);
+    		startActivity(intent); 
+    	}
+    }
+    
+    public void GoHome(View v) {
+		Intent intent=new Intent();
+		intent.setClass(Huncai.this, MainHome.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); 
+		startActivity(intent);
+    }
+}
